@@ -7,7 +7,7 @@ jobs:
     name: Wait for 2 seconds 
     runs-on: ubuntu-latest
     steps: 
-      - run: sleep 2 seconds
+      - run: sleep 2
 
   Step2: 
     name: Terraform init
