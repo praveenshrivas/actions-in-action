@@ -1,16 +1,16 @@
-name: Upload Artifact
+name: Save IP as Artifact
 
 on: [push]
 
 jobs:
-  artifact-demo:
+  save-ip:
     runs-on: ubuntu-latest
     steps:
-      - name: Create IP File
-        run: echo "Public IP: 13.233.123.45" > ec2_ip.txt
+      - name: Create IP file
+        run: echo "192.168.1.10" > ec2_ip.txt
 
-      - name: Upload Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ec2-ip-file
+          name: ec2-ip
           path: ec2_ip.txt
