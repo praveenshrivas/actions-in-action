@@ -6,6 +6,9 @@ jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
       - name: First Step
         run: echo "Welcome to GitHub Actions!!!"
         
