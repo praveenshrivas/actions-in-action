@@ -1,0 +1,12 @@
+name: Second Github Actions 
+
+on: [push]
+
+jobs:
+  welcome-02:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello 
+        run: echo "Hello, Welcome to to the Github Actions!!!"
+      - name: Run Hello.py 
+        run: python3 hello.py
