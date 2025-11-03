@@ -1,0 +1,10 @@
+name: First Github Actions 
+
+on: [push]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello 
+        run: echo "Hello, Welcome to to the Github Actions!!!"
