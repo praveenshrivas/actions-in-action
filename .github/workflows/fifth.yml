@@ -1,0 +1,12 @@
+# this workflow will trigger the flow manually
+
+name: Manual Run Demo 
+
+on: [push]
+
+jobs: 
+  welcome-05:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: First Step 
+        run: echo "This will be triggered manually!!!!"
