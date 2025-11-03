@@ -2,7 +2,8 @@
 
 name: Manual Run Demo 
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs: 
   welcome-05:
