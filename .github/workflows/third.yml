@@ -1,0 +1,16 @@
+name: Second Github Actions 
+
+on: [push]
+
+jobs:
+  welcome-03:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4  #<----- in the marketplace
+        
+      - name: Say Hello 
+        run: echo "Hello, Welcome to to the Github Actions!!!"
+        
+      - name: Run Hello.py 
+        run: python3 hello.py
