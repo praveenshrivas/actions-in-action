@@ -6,6 +6,9 @@ jobs:
   welcome:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4   # <-- this downloads your repo
+
       - name: Say Hello
         run: echo "Hello, welcome to GitHub Actions!"
 
