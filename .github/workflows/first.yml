@@ -1,27 +1,16 @@
-name: First GitHub Action
+name: Save IP as Artifact
 
 on: [push]
 
 jobs:
-  welcome:
+  save-ip:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Say Hello
-        run: echo "Hello, welcome to GitHub Actions!"
-
-      - name: Run hello.py
-        run: python3 hello.py
+      - name: Create IP file
+        run: echo "192.168.1.10" > ec2_ip.txt
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: output-file
-          path: output.txt
+          name: ec2-ip
+          path: ec2_ip.txt
