@@ -5,12 +5,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  context-demo:
+
+  steps-demo:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Display Runner 
-        if: github.ref == 'refs/heads/main'
-        run: echo "Deploying to Production..."
+      - name: Generate Version
+        id: version
+        run: echo "version=1.0.0" >> "$GITHUB_OUTPUT"
+
+      - name: Display Version
+        run: echo "Application Version = ${{ steps.version.outputs.version }}"
