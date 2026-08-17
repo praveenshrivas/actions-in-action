@@ -1,20 +1,16 @@
-name: Context Demo
+name: Secret Demo
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
-
-  steps-demo:
-
+  secret-demo:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Generate Version
-        id: version
-        run: echo "version=1.0.0" >> "$GITHUB_OUTPUT"
-
-      - name: Display Version
-        run: echo "Application Version = ${{ steps.version.outputs.version }}"
+      - name: Read Secret
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+        run: |
+          echo "Secret length is: ${#DEMO_SECRET}"
+          echo "Secret value is: $DEMO_SECRET"
