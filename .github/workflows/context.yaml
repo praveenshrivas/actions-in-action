@@ -12,7 +12,5 @@ jobs:
     steps:
 
       - name: Display Runner 
-        run: |
-          echo "OS = ${{ runner.os }}"
-          echo "Architecture = ${{ runner.arch }}"
-          echo "Runner Name = ${{ runner.name }}"
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploying to Production..."
