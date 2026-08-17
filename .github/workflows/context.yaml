@@ -1,16 +1,26 @@
-name: Secret Demo
+name: Artifact Demo
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
-  secret-demo:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Read Secret
-        env:
-          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+
+      - name: Create Build File
         run: |
-          echo "Secret length is: ${#DEMO_SECRET}"
-          echo "Secret value is: $DEMO_SECRET"
+          mkdir build
+          echo "Hello from GitHub Actions" > build/app.txt
+
+      - name: Show Build File
+        run: |
+          cat build/app.txt
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application
+          path: build/
