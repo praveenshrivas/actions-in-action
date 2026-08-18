@@ -126,14 +126,14 @@ jobs:
       - name: Create Ansible Inventory
         run: |
           echo "[web]" > inventory
-           echo "${{ needs.terraform.outputs.ec2_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=./ec2-key.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory
+          echo "${{ needs.terraform.outputs.ec2_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=./ec2-key.pem ansible_python_interpreter=/usr/bin/python3 ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory
 
 
       # ======================================
       # TEST SSH CONNECTION
       # ======================================
       - name: Install Python on EC2
-        run: ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} "sudo amazon-linux-extras install python3 -y"
+        run: ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} "sudo yum install -y python36"
         
       - name: Test Ansible Connection
         run: |
