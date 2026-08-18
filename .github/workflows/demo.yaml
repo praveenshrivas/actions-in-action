@@ -1,11 +1,16 @@
-name: AWS + Terraform
+name: AWS Terraform Ansible
 
 on:
   workflow_dispatch:
 
 jobs:
 
+  # ==========================================
+  # JOB 1 - TEST AWS CONNECTION
+  # ==========================================
+
   aws-test:
+
     runs-on: ubuntu-latest
 
     steps:
@@ -21,14 +26,24 @@ jobs:
         run: aws sts get-caller-identity
 
 
+  # ==========================================
+  # JOB 2 - TERRAFORM
+  # ==========================================
+
   terraform:
+
     needs: aws-test
+
     runs-on: ubuntu-latest
+
+    outputs:
+      ec2_ip: ${{ steps.get_ip.outputs.ec2_ip }}
 
     steps:
 
       - name: Checkout Code
         uses: actions/checkout@v4
+
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
@@ -37,11 +52,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+
       - name: Check Terraform Version
         run: terraform version
+
 
       - name: Terraform Init
         run: terraform init
@@ -50,12 +68,80 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+
       - name: Terraform Plan
         run: terraform plan
+
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name:  Get EC2 IP
+
+      - name: Get EC2 IP
         id: get_ip
-        run: echo "ec2_ip=$(terraform output -raw ec2_public_ip)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "ec2_ip=$(terraform output -raw ec2_public_ip)" >> "$GITHUB_OUTPUT"
+
+
+  # ==========================================
+  # JOB 3 - ANSIBLE
+  # ==========================================
+
+  ansible:
+
+    needs: terraform
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+
+      - name: Check Ansible Version
+        run: ansible --version
+
+
+      # ======================================
+      # SSH KEY
+      # ======================================
+
+      - name: Create SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
+          chmod 600 ec2-key.pem
+
+
+      # ======================================
+      # CREATE INVENTORY
+      # ======================================
+
+      - name: Create Ansible Inventory
+        run: |
+          echo "[web]" > inventory
+          echo "${{ needs.terraform.outputs.ec2_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=./ec2-key.pem" >> inventory
+
+
+      # ======================================
+      # TEST SSH CONNECTION
+      # ======================================
+
+      - name: Test Ansible Connection
+        run: |
+          ansible web -i inventory -m ping
+
+
+      # ======================================
+      # RUN ANSIBLE PLAYBOOK
+      # ======================================
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook -i inventory playbook.yml
