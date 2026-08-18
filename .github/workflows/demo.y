@@ -133,7 +133,7 @@ jobs:
       # TEST SSH CONNECTION
       # ======================================
       - name: Install Python on EC2
-        run: ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} "sudo yum install -y python3"
+        run: ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} "sudo amazon-linux-extras install python3 -y"
         
       - name: Test Ansible Connection
         run: |
