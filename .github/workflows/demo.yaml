@@ -56,5 +56,6 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
 
-      - name: Terraform Output
-        run: terraform output
+      - name:  Get EC2 IP
+        id: get_ip
+        run: echo "ec2_ip=$(terraform output -raw ec2_public_ip)" >> "$GITHUB_OUTPUT"
