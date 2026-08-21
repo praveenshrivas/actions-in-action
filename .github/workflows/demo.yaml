@@ -23,7 +23,8 @@ jobs:
           aws-region: ap-south-1
 
       - name: Check AWS Identity
-        run: aws sts get-caller-identity
+        run: |
+          aws sts get-caller-identity
 
 
   # ==========================================
@@ -41,9 +42,17 @@ jobs:
 
     steps:
 
+      # ------------------------------------------
+      # CHECKOUT
+      # ------------------------------------------
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
+
+      # ------------------------------------------
+      # AWS CREDENTIALS
+      # ------------------------------------------
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
@@ -53,29 +62,37 @@ jobs:
           aws-region: ap-south-1
 
 
+      # ------------------------------------------
+      # TERRAFORM
+      # ------------------------------------------
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-
       - name: Check Terraform Version
-        run: terraform version
-
+        run: |
+          terraform version
 
       - name: Terraform Init
-        run: terraform init
-
+        run: |
+          terraform init
 
       - name: Terraform Validate
-        run: terraform validate
-
+        run: |
+          terraform validate
 
       - name: Terraform Plan
-        run: terraform plan
-
+        run: |
+          terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve
 
+
+      # ------------------------------------------
+      # GET EC2 PUBLIC IP
+      # ------------------------------------------
 
       - name: Get EC2 IP
         id: get_ip
@@ -95,9 +112,17 @@ jobs:
 
     steps:
 
+      # ------------------------------------------
+      # CHECKOUT
+      # ------------------------------------------
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
+
+      # ------------------------------------------
+      # INSTALL ANSIBLE
+      # ------------------------------------------
 
       - name: Install Ansible
         run: |
@@ -105,13 +130,18 @@ jobs:
           sudo apt-get install -y ansible
 
 
+      # ------------------------------------------
+      # CHECK ANSIBLE
+      # ------------------------------------------
+
       - name: Check Ansible Version
-        run: ansible --version
+        run: |
+          ansible --version
 
 
-      # ======================================
-      # SSH KEY
-      # ======================================
+      # ------------------------------------------
+      # CREATE SSH KEY
+      # ------------------------------------------
 
       - name: Create SSH Key
         run: |
@@ -119,30 +149,38 @@ jobs:
           chmod 600 ec2-key.pem
 
 
-      # ======================================
+      # ------------------------------------------
       # CREATE INVENTORY
-      # ======================================
+      # ------------------------------------------
 
       - name: Create Ansible Inventory
         run: |
           echo "[web]" > inventory
+
           echo "${{ needs.terraform.outputs.ec2_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=./ec2-key.pem ansible_python_interpreter=/usr/bin/python3 ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory
 
 
-      # ======================================
-      # TEST SSH CONNECTION
-      # ======================================
-      - name: Install Python on EC2
-        run: ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} "sudo yum install -y python36"
-        
+      # ------------------------------------------
+      # SHOW INVENTORY
+      # ------------------------------------------
+
+      - name: Show Inventory
+        run: |
+          cat inventory
+
+
+      # ------------------------------------------
+      # TEST ANSIBLE CONNECTION
+      # ------------------------------------------
+
       - name: Test Ansible Connection
         run: |
           ansible web -i inventory -m ping
 
 
-      # ======================================
+      # ------------------------------------------
       # RUN ANSIBLE PLAYBOOK
-      # ======================================
+      # ------------------------------------------
 
       - name: Run Ansible Playbook
         run: |
