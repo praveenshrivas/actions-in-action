@@ -42,17 +42,9 @@ jobs:
 
     steps:
 
-      # ------------------------------------------
-      # CHECKOUT
-      # ------------------------------------------
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
-
-      # ------------------------------------------
-      # AWS CREDENTIALS
-      # ------------------------------------------
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
@@ -62,37 +54,34 @@ jobs:
           aws-region: ap-south-1
 
 
-      # ------------------------------------------
-      # TERRAFORM
-      # ------------------------------------------
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+
 
       - name: Check Terraform Version
         run: |
           terraform version
 
+
       - name: Terraform Init
         run: |
           terraform init
+
 
       - name: Terraform Validate
         run: |
           terraform validate
 
+
       - name: Terraform Plan
         run: |
           terraform plan
+
 
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve
 
-
-      # ------------------------------------------
-      # GET EC2 PUBLIC IP
-      # ------------------------------------------
 
       - name: Get EC2 IP
         id: get_ip
@@ -130,10 +119,6 @@ jobs:
           sudo apt-get install -y ansible
 
 
-      # ------------------------------------------
-      # CHECK ANSIBLE
-      # ------------------------------------------
-
       - name: Check Ansible Version
         run: |
           ansible --version
@@ -147,6 +132,18 @@ jobs:
         run: |
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ec2-key.pem
           chmod 600 ec2-key.pem
+
+
+      # ------------------------------------------
+      # CHECK EC2 PYTHON
+      # ------------------------------------------
+
+      - name: Check EC2 Python
+        run: |
+          ssh -i ec2-key.pem \
+            -o StrictHostKeyChecking=no \
+            ec2-user@${{ needs.terraform.outputs.ec2_ip }} \
+            "cat /etc/os-release && echo '--- Python ---' && python3 --version && echo '--- Path ---' && which python3"
 
 
       # ------------------------------------------
@@ -170,7 +167,7 @@ jobs:
 
 
       # ------------------------------------------
-      # TEST ANSIBLE CONNECTION
+      # TEST ANSIBLE
       # ------------------------------------------
 
       - name: Test Ansible Connection
@@ -179,7 +176,7 @@ jobs:
 
 
       # ------------------------------------------
-      # RUN ANSIBLE PLAYBOOK
+      # RUN PLAYBOOK
       # ------------------------------------------
 
       - name: Run Ansible Playbook
